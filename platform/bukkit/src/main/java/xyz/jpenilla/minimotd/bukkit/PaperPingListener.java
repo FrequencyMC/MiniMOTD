@@ -47,7 +47,8 @@ public final class PaperPingListener implements Listener {
   public void handlePing(final @NonNull PaperServerListPingEvent event) {
     final MiniMOTDConfig cfg = this.miniMOTD.configManager().mainConfig();
 
-    final PingResponse<CachedServerIcon> response = this.miniMOTD.createMOTD(cfg, event.getNumPlayers(), event.getMaxPlayers());
+    final boolean legacy = event.getClient().getProtocolVersion() < 735;
+    final PingResponse<CachedServerIcon> response = this.miniMOTD.createMOTD(cfg, event.getNumPlayers(), event.getMaxPlayers(), legacy);
 
     response.playerCount().applyCount(event::setNumPlayers, event::setMaxPlayers);
     response.motd(motd -> {

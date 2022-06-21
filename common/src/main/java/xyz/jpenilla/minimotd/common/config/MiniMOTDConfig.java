@@ -44,14 +44,22 @@ public final class MiniMOTDConfig {
   }
 
   public MiniMOTDConfig(final @NonNull MOTD @NonNull ... defaults) {
-    this.motds.addAll(Arrays.asList(defaults));
+    final List<@NonNull MOTD> list = Arrays.asList(defaults);
+    this.legacyMotds.addAll(list);
+    this.modernMotds.addAll(list);
   }
 
-  @Comment("The list of MOTDs to display\n"
+  @Comment("The list of MOTDs to display (1.15 and below)\n"
     + "\n"
     + " - Supported placeholders: <online_players>, <max_players>\n"
     + " - Putting more than one will cause one to be randomly chosen each refresh")
-  private final List<MOTD> motds = new ArrayList<>();
+  private final List<MOTD> legacyMotds = new ArrayList<>();
+
+  @Comment("The list of MOTDs to display (1.16 and above)\n"
+    + "\n"
+    + " - Supported placeholders: <online_players>, <max_players>\n"
+    + " - Putting more than one will cause one to be randomly chosen each refresh")
+  private final List<MOTD> modernMotds = new ArrayList<>();
 
   @Comment("Enable MOTD-related features")
   private boolean motdEnabled = true;
@@ -161,8 +169,12 @@ public final class MiniMOTDConfig {
     return this.iconEnabled;
   }
 
-  public @NonNull List<MOTD> motds() {
-    return this.motds;
+  public @NonNull List<MOTD> modernMotds() {
+    return this.modernMotds;
+  }
+
+  public @NonNull List<MOTD> legacyMotds() {
+    return this.legacyMotds;
   }
 
   public boolean motdEnabled() {

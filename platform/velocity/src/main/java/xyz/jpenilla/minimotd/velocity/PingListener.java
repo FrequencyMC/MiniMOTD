@@ -27,6 +27,7 @@ import com.google.inject.Inject;
 import com.velocitypowered.api.event.EventTask;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.proxy.ProxyPingEvent;
+import com.velocitypowered.api.network.ProtocolVersion;
 import com.velocitypowered.api.proxy.server.ServerPing;
 import com.velocitypowered.api.util.Favicon;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -53,7 +54,8 @@ public final class PingListener {
     final MiniMOTDConfig config = this.miniMOTD.configManager().resolveConfig(event.getConnection().getVirtualHost().orElse(null));
     final ServerPing.Builder pong = event.getPing().asBuilder();
 
-    final PingResponse<Favicon> response = this.miniMOTD.createMOTD(config, pong.getOnlinePlayers(), pong.getMaximumPlayers());
+    final boolean legacy = event.getConnection().getProtocolVersion().compareTo(ProtocolVersion.MINECRAFT_1_16) < 0;
+    final PingResponse<Favicon> response = this.miniMOTD.createMOTD(config, pong.getOnlinePlayers(), pong.getMaximumPlayers(), legacy);
     response.icon(pong::favicon);
     response.motd(pong::description);
     response.playerCount().applyCount(pong::onlinePlayers, pong::maximumPlayers);

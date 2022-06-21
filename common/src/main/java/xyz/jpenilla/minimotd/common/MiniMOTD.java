@@ -24,6 +24,7 @@
 package xyz.jpenilla.minimotd.common;
 
 import java.nio.file.Path;
+import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
@@ -78,6 +79,10 @@ public final class MiniMOTD<I> {
   }
 
   public PingResponse<I> createMOTD(final MiniMOTDConfig config, final int onlinePlayers, final int maxPlayers) {
+    return this.createMOTD(config, onlinePlayers, maxPlayers, false);
+  }
+
+  public PingResponse<I> createMOTD(final MiniMOTDConfig config, final int onlinePlayers, final int maxPlayers, final boolean legacy) {
     final PingResponse.PlayerCount count = config.modifyPlayerCount(onlinePlayers, maxPlayers);
     final PingResponse.Builder<I> response = PingResponse.<I>builder()
       .playerCount(count)
@@ -86,11 +91,12 @@ public final class MiniMOTD<I> {
 
     @Nullable String iconString = null;
     if (config.motdEnabled()) {
-      if (config.motds().isEmpty()) {
+      final List<MiniMOTDConfig.MOTD> motds = legacy ? config.legacyMotds() : config.modernMotds();
+      if (motds.isEmpty()) {
         throw new IllegalStateException("MOTD is enabled, but there are no MOTDs in the config file?");
       }
-      final int index = config.motds().size() == 1 ? 0 : ThreadLocalRandom.current().nextInt(config.motds().size());
-      final MiniMOTDConfig.MOTD motdConfig = config.motds().get(index);
+      final int index = motds.size() == 1 ? 0 : ThreadLocalRandom.current().nextInt(motds.size());
+      final MiniMOTDConfig.MOTD motdConfig = motds.get(index);
       final Component motd = Components.ofChildren(
         parse(motdConfig.line1(), count),
         newline(),
